@@ -26,6 +26,24 @@ const commands = [
   new SlashCommandBuilder()
     .setName('stats')
     .setDescription('R6 statok lekérése (PSN / XBOX / PC).')
+
+    // 1) KÖTELEZŐ ELŐL
+    .addStringOption(o =>
+      o.setName('playlist')
+        .setDescription('Játékmód / lejátszási lista')
+        .addChoices(
+          { name: 'All Playlists', value: 'all' },
+          { name: 'Ranked', value: 'ranked' },
+          { name: 'Unranked', value: 'unranked' },
+          { name: 'Quick Match', value: 'quick' },
+          { name: 'Dual Front', value: 'dualfront' },
+          { name: 'Siege Cup', value: 'siegecup' },
+          { name: 'Arcade', value: 'arcade' }
+        )
+        .setRequired(true)
+    )
+
+    // 2) NEM KÖTELEZŐK UTÁNA
     .addStringOption(o =>
       o.setName('name')
         .setDescription('Felhasználónév (PSN / XBL / Uplay)')
@@ -40,21 +58,8 @@ const commands = [
           { name: 'PC (Uplay)', value: 'uplay' }
         )
         .setRequired(false)
-    )
-    .addStringOption(o =>
-      o.setName('playlist')
-        .setDescription('Játékmód / lejátszási lista')
-        .addChoices(
-          { name: 'All Playlists', value: 'all' },
-          { name: 'Ranked', value: 'ranked' },
-          { name: 'Unranked', value: 'unranked' },
-          { name: 'Quick Match', value: 'quick' },
-          { name: 'Dual Front', value: 'dualfront' },
-          { name: 'Siege Cup', value: 'siegecup' },
-          { name: 'Arcade', value: 'arcade' }
-        )
-        .setRequired(true)
     ),
+
   new SlashCommandBuilder()
     .setName('challenges')
     .setDescription('Aktuális heti R6 kihívások megjelenítése.')
