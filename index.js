@@ -26,8 +26,6 @@ const commands = [
   new SlashCommandBuilder()
     .setName('stats')
     .setDescription('R6 statok lekérése (PSN / XBOX / PC).')
-
-    // 1) KÖTELEZŐ ELŐL
     .addStringOption(o =>
       o.setName('playlist')
         .setDescription('Játékmód / lejátszási lista')
@@ -42,8 +40,6 @@ const commands = [
         )
         .setRequired(true)
     )
-
-    // 2) NEM KÖTELEZŐK UTÁNA
     .addStringOption(o =>
       o.setName('name')
         .setDescription('Felhasználónév (PSN / XBL / Uplay)')
