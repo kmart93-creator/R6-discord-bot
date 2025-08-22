@@ -11,6 +11,19 @@ import { getOperatorImage } from './operator_images.js';
 
 const token = process.env.DISCORD_TOKEN;
 if (!token) throw new Error('Hiányzik a DISCORD_TOKEN (.env vagy Render/Railway env)!');
+// KÉPEK – a GitHub RAW-ból
+const atkName = data.topAttackerName || data.topAttacker?.name;
+const defName = data.topDefenderName || data.topDefender?.name;
+
+if (atkName) {
+  const img = getOperatorImage(atkName);
+  if (img?.icon) embed.setThumbnail(img.icon);
+}
+if (defName) {
+  const img = getOperatorImage(defName);
+  if (img?.figure) embed.setImage(img.figure);
+}
+
 
 // users.json / user.json beolvasás (bármelyik jó)
 let users = {};
