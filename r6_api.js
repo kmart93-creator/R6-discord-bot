@@ -14,12 +14,26 @@ const client = axios.create({
   }
 });
 
-// kis helper a szövegekhez
+// A parancsban használt értékeket (ranked, siegecup, stb.) ide tudjuk lefordítani,
+// ha később szükség lesz rá a kéréshez. Most overview-t kérünk, így nem kulcskérdés.
+const PLAYLIST_MAP = {
+  all: 'all',
+  ranked: 'ranked',
+  unranked: 'unranked',
+  quick: 'quick',
+  dualfront: 'dual-front',
+  siegecup: 'siege-cup',
+  arcade: 'arcade'
+};
+
 const fmtRP = (n) => (n != null ? `${Number(n).toLocaleString('en-US')} RP` : null);
 
-// Statok lekérése (overview); top op sorok egyszerűsítve
-export async function fetchStats(username, platform = DEFAULT_PLATFORM) {
+// Statok lekérése (overview)
+export async function fetchStats(username, platform = DEFAULT_PLATFORM, playlist = 'all') {
   if (!TRN_API_KEY) throw new Error('Hiányzik a TRN_API_KEY!');
+
+  // jelenleg overview-t olvasunk; a playlist itt csak címkézéshez kell
+  const _playlistKey = PLAYLIST_MAP[playlist] || 'all';
   const url = `/r6siege/standard/profile/${encodeURIComponent(platform)}/${encodeURIComponent(username)}`;
 
   try {
@@ -34,7 +48,7 @@ export async function fetchStats(username, platform = DEFAULT_PLATFORM) {
       return v?.displayValue ?? v?.value ?? null;
     };
 
-    // (ha a TRN nem ad, marad null; az embed ezt szépen kezeli)
+    // rang + RP
     const currentRankText = (get('rankName') || get('rank')) && get('mmr')
       ? `${get('rankName') || get('rank')} — ${fmtRP(get('mmr'))}`
       : null;
@@ -42,7 +56,7 @@ export async function fetchStats(username, platform = DEFAULT_PLATFORM) {
       ? `${get('maxRankName') || get('peakRank')} — ${fmtRP(get('maxMmr'))}`
       : null;
 
-    // top op nevek (egyszerű fallback – sok profilon nincs részletes operátor bontás a publikus API-ban)
+    // Ha nincs részletes operátor stat a publikus API-ban, adunk értelmes fallback neveket
     const topAttackerName = get('topAttacker') || 'Ash';
     const topDefenderName = get('topDefender') || 'Jäger';
 
@@ -57,15 +71,16 @@ export async function fetchStats(username, platform = DEFAULT_PLATFORM) {
       currentRankText,
       peakRankText,
 
-      // ezek szöveg sorok az embedhez (ha lenne pontos W/L/KD per op, ide lehet pakolni)
       topAttackerName,
       topDefenderName,
+      // ha később lesz pontos W/L/KD per op, ide illeszthető:
       topAttackerLine: topAttackerName,
       topDefenderLine: topDefenderName
     };
   } catch (err) {
-    // DEMO fallback (ha 401/403, stb.)
     const status = err?.response?.status;
+
+    // DEMO fallback
     if (process.env.DEMO_MODE === '1' && status) {
       return {
         username,
@@ -88,6 +103,6 @@ export async function fetchStats(username, platform = DEFAULT_PLATFORM) {
 }
 
 export async function fetchChallenges() {
-  // Nincs hivatalos weekly endpoint — üres lista
+  // nincs publikus weekly endpoint – üres lista
   return { items: [] };
-} 
+}
